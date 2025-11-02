@@ -1,0 +1,22 @@
+{
+  "name": "proyecto_landing",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss-import": "^16.1.1",
+    "postcss-nested": "^7.0.2",
+    "postcss-simple-vars": "^7.0.1",
+    "tailwindcss": "^4.1.16",
+    "vite": "npm:rolldown-vite@7.1.14"
+  },
+  "overrides": {
+    "vite": "npm:rolldown-vite@7.1.14"
+  }
+}
