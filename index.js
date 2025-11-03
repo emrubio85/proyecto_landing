@@ -188,3 +188,72 @@ stars.forEach((star, i) => {
     
 starContainer.addEventListener('mouseleave', hideActiveStar)
 
+document.addEventListener('DOMContentLoaded', () => {
+  const marquee = document.getElementById('marquee-js');
+  if (!marquee) return;
+
+  const inner = marquee.querySelector('.marquee__inner');
+  const group = inner.querySelector('.marquee__group');
+
+  // Si no existe el clon, clonar una vez
+  if (!inner.querySelectorAll('.marquee__group')[1]) {
+    const clone = group.cloneNode(true);
+    clone.setAttribute('aria-hidden', 'true');
+    inner.appendChild(clone);
+  }
+
+  // Calcular duración basada en ancho para velocidad constante
+  const speed = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--marquee-speed')) || 100;
+
+  function updateDuration() {
+    // ancho total del contenido (grupo + clon)
+    const totalWidth = inner.scrollWidth;
+    // tiempo en segundos = px / (px/s)
+    const duration = totalWidth / speed;
+    inner.style.setProperty('--dur', `${duration}s`);
+  }
+
+  // Esperar un tick en caso de fuentes/imagenes que cambian tamaño
+  setTimeout(updateDuration, 50);
+  window.addEventListener('resize', updateDuration);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('orderBtn');
+  if (!btn) return;
+
+  const text = btn.querySelector('.order-text');
+  const truck = btn.querySelector('.truck');
+
+  btn.addEventListener('click', (e) => {
+    // evita múltiples clicks
+    if (btn.classList.contains('ordering')) {
+      e.preventDefault();
+      return;
+    }
+
+    // iniciar animación
+    btn.classList.add('ordering');
+    // cambiar texto
+    text.textContent = 'Ordenando...';
+
+    // cuando termine la animación del SVG (truck), marcamos "En camino"
+    const onAnimEnd = () => {
+      btn.classList.remove('ordering');
+      btn.classList.add('finished');
+
+      text.textContent = 'En camino ✓';
+      // reactivar botón (si quieres volver a permitir pedidos, quitamos 'finished' luego)
+      setTimeout(() => {
+        btn.classList.remove('finished');
+        // opcional: dejar texto original o mantener "En camino ✓"
+        text.textContent = 'Ordenar';
+      }, 1800);
+
+      truck.removeEventListener('animationend', onAnimEnd);
+    };
+
+    truck.addEventListener('animationend', onAnimEnd);
+  });
+});
+

@@ -209,33 +209,59 @@ header > .collapsible-header{
     color: gold;
 }
 
-/* Repite las imágenes al final para dar efecto continuo */
-.avatar-marquee {
-  display: inline-flex;
-  gap: 1rem;
-  animation: marquee 18s linear infinite;
-  align-items: center;
-  will-change: transform;
-}
-.avatar-marquee:hover { animation-play-state: paused; }
+:root { --marquee-speed: 100; /* px/seg (ajusta si quieres más/menos velocidad) */ }
 
+.marquee { overflow: hidden; width: 100%; box-sizing: border-box; }
+
+.avatar-marquee {
+  /* ahora avatar-marquee actúa como contenedor del track */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.marquee__inner {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  white-space: nowrap;
+  will-change: transform;
+  transform: translate3d(0,0,0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  animation: marquee var(--dur, 18s) linear infinite;
+}
+
+.marquee__inner:hover { animation-play-state: paused; }
+
+.marquee__group {
+  display: flex;
+  gap: inherit;
+  flex: 0 0 auto;
+}
+
+/* avatars (copiado/adaptado del tuyo) */
 .avatar {
-  width: 56px; height: 56px;
+  display: block;
+  width: 100px;
+  height: 100px;
+  min-width: 100px;
+  min-height: 100px;
   border-radius: 9999px;
   object-fit: cover;
-  border: 2px solid rgba(255,255,255,0.08);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  object-position: center;
+  border: 2px solid rgba(0,0,0,0.06);
 }
 
-/* Ajustes responsive */
+/* responsive */
 @media (max-width: 768px) {
-  .avatar { width: 44px; height: 44px; }
-  .avatar-marquee { gap: .5rem; animation-duration: 14s; }
+  .avatar { width: 48px; height: 48px; min-width:48px; min-height:48px; }
+  .marquee__inner { gap: .5rem; }
 }
 
+/* animación: mueve la mitad (por eso duplicamos la fila) */
 @keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); } /* asume que la fila está duplicada */
+  from { transform: translate3d(0,0,0); }
+  to   { transform: translate3d(-50%,0,0); }
 }
 
 @keyframes fade {
@@ -281,3 +307,171 @@ header > .collapsible-header{
     }
     
 }
+#orderBtn {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding-right: 2.75rem; /* espacio para la animación del camión */
+  cursor: pointer;
+}
+
+/* icono flecha - transición suave */
+.icon-arrow {
+  transition: transform .25s ease, opacity .18s ease;
+}
+
+/* SVG camión - oculto por defecto y posicionado a la derecha dentro del botón */
+.truck {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  width: 1.4rem;
+  height: 1.4rem;
+  transform: translate(0, -50%) scale(.9);
+  opacity: 0;
+  pointer-events: none;
+  color: #fff; /* el color toma el text-color del botón */
+}
+
+/* ruedas (si quieres efecto rotación) */
+.wheel { transform-origin: center; }
+
+/* Estado "ordering": se activa con JS */
+#orderBtn.ordering {
+  /* evitar doble clicks mientras anima */
+  pointer-events: none;
+}
+
+/* al ordenar: ocultamos la flecha y desplazamos el texto ligeramente */
+#orderBtn.ordering .icon-arrow { transform: translateX(8px); opacity: 0; }
+#orderBtn.ordering .order-text { transform: translateX(-6px); opacity: 0.95; }
+
+/* mostramos el camión y ejecutamos la animación "drive" */
+#orderBtn.ordering .truck {
+  opacity: 1;
+  animation: truck-drive 1.2s cubic-bezier(.22,.9,.35,1) forwards;
+}
+
+/* rotación de ruedas durante la animación */
+#orderBtn.ordering .wheel--left,
+#orderBtn.ordering .wheel--right {
+  animation: wheel-rotate 1.2s linear forwards;
+}
+
+/* Keyframes */
+@keyframes truck-drive {
+  0%   { transform: translate(0, -50%) scale(.9); opacity: 1; }
+  60%  { transform: translate(120%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(260%, -50%) scale(1.05); opacity: 0; }
+}
+
+@keyframes wheel-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(720deg); } /* dos vueltas */
+}
+
+/* estados finales / small feedback */
+#orderBtn.finished {
+  /* color/estilo opcional cuando ya se completó: cambiamos el texto, puedes ajustar */
+  transform: none;
+  pointer-events: auto;
+}
+
+.subscribe {
+  gap: .5rem;
+  align-items: center;
+}
+
+/* input: transición suave y efecto focus */
+.subscribe__input {
+  background: transparent;
+  border: 0;
+  transition: box-shadow .18s ease, transform .18s ease;
+  font-size: 0.95rem;
+}
+
+/* focus: glow y pequeño "pop" */
+.subscribe__input:focus {
+  outline: none;
+  box-shadow: 0 6px 18px rgba(59,130,246,0.12), 0 1px 0 rgba(0,0,0,0.02) inset;
+  transform: translateY(-1px);
+  border-radius: 9999px;
+}
+
+/* shake (email inválido) */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+/* botón: preparado para transformar su contenido */
+.subscribe__btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  padding: 0 .9rem;
+  border-radius: 9999px;
+  color: white;
+  overflow: visible;
+}
+
+/* texto del botón y transiciones */
+.subscribe__btn .btn-text {
+  transition: opacity .18s ease, transform .18s ease;
+  display: inline-block;
+  line-height: 1;
+}
+
+/* spinner */
+.btn-spinner, .btn-check {
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  right: .55rem;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* darle estilo al spinner (rotación) */
+.btn-spinner circle {
+  stroke-dasharray: 120;
+  stroke-dashoffset: 80;
+  stroke-linecap: round;
+  transition: stroke-dashoffset .4s linear;
+}
+
+/* animación de rotación */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* estado "sending" */
+.subscribe__btn.sending {
+  pointer-events: none;
+}
+.subscribe__btn.sending .btn-text { opacity: 0.0; transform: translateY(-4px); }
+.subscribe__btn.sending .btn-spinner {
+  opacity: 1;
+  animation: spin .9s linear infinite;
+  right: .55rem;
+}
+
+/* estado "done" (check) */
+.subscribe__btn.done .btn-text { opacity: 1; transform: translateY(-2px); }
+.subscribe__btn.done .btn-check { opacity: 1; }
+
+/* small helpers */
+.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* shake aplicado al contenedor cuando input es inválido */
+.subscribe.shake { animation: shake .6s both; }
