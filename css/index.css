@@ -158,7 +158,7 @@ header > .collapsible-header{
 }
 
 .menu-btn:hover{
-    background-color: #BE3345;
+    background-color: #110103;
     color: #fff;
 }
 /* ----  -------*/
@@ -209,6 +209,34 @@ header > .collapsible-header{
     color: gold;
 }
 
+/* Repite las imágenes al final para dar efecto continuo */
+.avatar-marquee {
+  display: inline-flex;
+  gap: 1rem;
+  animation: marquee 18s linear infinite;
+  align-items: center;
+  will-change: transform;
+}
+.avatar-marquee:hover { animation-play-state: paused; }
+
+.avatar {
+  width: 56px; height: 56px;
+  border-radius: 9999px;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.08);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* Ajustes responsive */
+@media (max-width: 768px) {
+  .avatar { width: 44px; height: 44px; }
+  .avatar-marquee { gap: .5rem; animation-duration: 14s; }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); } /* asume que la fila está duplicada */
+}
 
 @keyframes fade {
     from {
